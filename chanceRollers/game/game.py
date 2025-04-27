@@ -2,10 +2,10 @@ import pandas as pd
 
 import numpy as np
 
-#import sys
-#sys.path.append("/Users/ddclarke/development/python/uvaMSDS/DS5100/finalProject")
+import sys
+sys.path.append("/Users/ddclarke/development/python/uvaMSDS/DS5100/finalProject")
 
-#from chanceRollers.theDie.die import Die
+from chanceRollers.theDie.die import Die
 
 class Game:
     """

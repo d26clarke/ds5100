@@ -2,11 +2,11 @@ import pandas as pd
 
 import numpy as np
 
-#import sys
-#sys.path.append("/Users/ddclarke/development/python/uvaMSDS/DS5100/finalProject")
+import sys
+sys.path.append("/Users/ddclarke/development/python/uvaMSDS/DS5100/finalProject")
 
-#from chanceRollers.theDie.die import Die
-#from chanceRollers.game import Game
+from chanceRollers.theDie.die import Die
+from chanceRollers.game import Game
 
 class Analyzer:
     """
@@ -380,7 +380,7 @@ if __name__ == '__main__':
     myInstance.play(10)
 
     myAnalyzerInstance: Analyzer = Analyzer(myInstance) 
-    myAnalyerErr: Analyzer = Analyzer(myErrorInstance)
+    #myAnalyerErr: Analyzer = Analyzer(myErrorInstance)
 
     #Jackot Information
     print(f"Did I hit any jackpots? \n{myAnalyzerInstance.jackpots()}")
