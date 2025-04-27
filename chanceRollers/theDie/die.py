@@ -10,7 +10,7 @@ class Die:
 
     Attributes:
        
-        __privateDataFrame (pd.DataFrame): Used to hold both die face and weight data points
+        _privateDataFrame (pd.DataFrame): Used to hold both die face and weight data points
     
     Methods:
         __init__():
@@ -26,7 +26,7 @@ class Die:
        
         """Initializes Die Class
            Initializes the weights to 1 for each die face
-           Saves die faces and weights __privateDataFrame with die faces in the index
+           Saves die faces and weights _privateDataFrame with die faces in the index
 
         Args:
             theDie (np.array):  NumPy array of Die faces where array dtype(strings|numbers)
@@ -53,16 +53,17 @@ class Die:
         #Build Dynamic Index
         self.theDie = theDie
         #self.privateDataFrame: pd.DataFrame = pd.DataFrame(self.theDie, columns=['dieValue'], index=['Face1', 'Face2', 'Face3', 'Face4', 'Face5', 'Face6'] )
-        self.__privateDataFrame: pd.DataFrame = pd.DataFrame(self.theDie, columns=['dieValue'], index=[ 'Face' + str(n) for n in range(1,len(np.unique(theDie)) + 1) ] )
+        self._privateDataFrame: pd.DataFrame = pd.DataFrame(self.theDie, columns=['dieValue'], index=[ 'Face' + str(n) for n in range(1,len(np.unique(theDie)) + 1) ] )
 
         #startFace: str = [ 'Face' + str(n) for n in range(1,len(np.unique(theDie)) + 1) ][0]
         #endFace: str = [ 'Face' + str(n) for n in range(1,len(np.unique(theDie)) + 1) ][-1]
         #Initialize die weights to 1.0
         #self.privateDataFrame.loc['Face1':'Face6'] = 1.0
         #self.privateDataFrame.loc["'" + startFace + "'":"'" + endFace + "'"] = 1.0
-        for idx, row in self.__privateDataFrame.iterrows():
+
+        for idx, row in self._privateDataFrame.iterrows():
             #Modify Face Value
-            self.__privateDataFrame.loc[idx] = 1.0
+            self._privateDataFrame.loc[idx] = 1.0
             #print(f"Index: {idx2}")
             #print(f"Weight for {idx2}: {row2['dieValue']}")
 
@@ -85,10 +86,10 @@ class Die:
         """
 
         #Get the length of the dataFrame
-        dataFrameLength: int = len(self.__privateDataFrame)
+        dataFrameLength: int = len(self._privateDataFrame)
         
         #face_name must Exist in the die array
-        if not (face_name in self.__privateDataFrame.index):
+        if not (face_name in self._privateDataFrame.index):
              raise IndexError(f"{face_name} does not exist in the die array: ")
         print(f"New Weight Type: {type(new_weight)}" )
         #new_weight must be numeric or castable as numeric
@@ -97,9 +98,9 @@ class Die:
         
         if isinstance(new_weight, (float)):
             #Set all die faces
-            for idx, row in self.__privateDataFrame.iterrows():
+            for idx, row in self._privateDataFrame.iterrows():
                 #Modify Face Value
-                self.__privateDataFrame.loc[idx] = (1 - new_weight)/(dataFrameLength - 1)
+                self._privateDataFrame.loc[idx] = (1 - new_weight)/(dataFrameLength - 1)
 
             #self.privateDataFrame.loc['Face1':'Face6'] = (1 - new_weight)/5
             #self.privateDataFrame.loc['Face1':'Face6'] = (1 - new_weight)/dataFrameLength - 1
@@ -114,16 +115,16 @@ class Die:
 
             #Set all die faces
             print(f"Potential Data Frame Row Values: {(1 - new_weight)/(dataFrameLength - 1)}" )
-            for idx, row in self.__privateDataFrame.iterrows():
+            for idx, row in self._privateDataFrame.iterrows():
                 #Modify Face Value
-                self.__privateDataFrame.loc[idx] = (1 - new_weight)/(dataFrameLength - 1)
+                self._privateDataFrame.loc[idx] = (1 - new_weight)/(dataFrameLength - 1)
             #self.privateDataFrame.loc['Face1':'Face6'] = (1 - new_weight)/5
             #self.privateDataFrame.loc['Face1':'Face6'] = (1 - new_weight)/dataFrameLength - 1
             #self.privateDataFrame.loc["'" + startFace + "'":"'" + endFace + "'"] = (1 - new_weight)/dataFrameLength - 1
 
         
         #Modify the requested die face
-        self.__privateDataFrame.loc[face_name] = new_weight
+        self._privateDataFrame.loc[face_name] = new_weight
     
     # Instance method roll_die
     def roll_die(self, how_many_times: int = 1) -> list:
@@ -138,47 +139,39 @@ class Die:
         """
 
         print(f"Entering roll_die: {how_many_times}")
+       
         
         #Die roll outcome list set to zero list entries
         outcomes: list = list()
 
         #Make sure the die is properly weighted!
-        for idx, tblRow in self.__privateDataFrame.iterrows():
+        for idx, tblRow in self._privateDataFrame.iterrows():
             print(f"Index: {idx}")
             print(f"Weight for {idx}: {tblRow['dieValue']}")
             print("-" * 20)
 
+        facesList: list = self._privateDataFrame.index.to_list()
+        weightsList: list = self._privateDataFrame['dieValue'].to_list()
+
         for roll in range(how_many_times):
-            # Apply weights.  NOTE: Weights must sum to 1
-            #self.privateDataFrame.loc['Face1':'Face6'] = 1/6
-            # Generate a random number between 0 and 1
-            rand_num = random.random()
-            print(f"The Random Number is: {rand_num}")
-            cumulative_prob = 0
+            
             print(f"Roll Number: {roll + 1}")
-            for index, row in self.__privateDataFrame.iterrows():
-                print(f"INDEX: {index} - ROW: {row['dieValue']}")
-                cumulative_prob += row['dieValue']
-                print(f"DEBUG: {cumulative_prob}")
-                if rand_num < cumulative_prob:
-                    print("We have a hit!")
-                    if ( (roll+1) == how_many_times):
-                        #Show the selected die face
-                        #Set all die faces to 0.0
-                        for idx, row2 in self.__privateDataFrame.iterrows():
-                            #Modify Face Value
-                            self.__privateDataFrame.loc[idx] = 0.0
-                        #self.privateDataFrame.loc['Face1':'Face6'] = 0.0
-                        #Set the randomly selected die face of the die that we have a hit on
-                        self.__privateDataFrame.loc[index, 'dieValue'] = 1.0  #This will represent die state
-                        #Append the result to the outcomes list
-                        outcomes.append(index)
-                        #Now that We have a hit, use the break statement to
-                        #terminate this inner loop to prevent the recording of
-                        #another die face value
-                    else:
-                        outcomes.append(index)
-                    break
+
+            if ( (roll+1) == how_many_times):
+                #Show the selected die face
+                #Set all die faces to 0.0
+                self._privateDataFrame.loc[facesList[0]:facesList[-1]] = 0.0
+                #Set the randomly selected die face of the die that we have a hit on
+                #Append the result to the outcomes list
+                outcomes.append(random.choices(facesList, weights=weightsList, k=1)[0])
+                self._privateDataFrame.loc[outcomes[-1], 'dieValue'] = 1.0  #This will represent die state
+                
+                #Now that We have a hit, use the break statement to
+                #terminate this inner loop to prevent the recording of
+                #another die face value
+            else:
+                #outcomes.append(index)
+                outcomes.append(random.choices(facesList, weights=weightsList, k=1)[0])
                     
         return outcomes
     
@@ -189,7 +182,7 @@ class Die:
         
         Returns a copy of the private data frame
         """
-        return self.__privateDataFrame
+        return self._privateDataFrame
     
     
 if __name__ == '__main__':
@@ -204,12 +197,12 @@ if __name__ == '__main__':
     print(f"Show list of attribute for object: {dir(myInstance)} \n")
     print(f"Is instance an object of class Die: {isinstance(myInstance, Die)} \n")
     
-    #print(f"TTTTT: {myInstance.__privateDataFrame}")
+    #print(f"TTTTT: {myInstance._privateDataFrame}")
     #print(f"TTTTT: {myInstance.die_state}")
 
     myInstance.change_die_weight('Face3', .30)
 
-    print(myInstance.roll_die(1))
+    print(f"Outcomes: \n{myInstance.roll_die(3)}")
 
     dieStateDataFrame: pd.DataFrame = myInstance.die_state()
     print(f"Die State: {dieStateDataFrame}")
